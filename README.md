@@ -1,53 +1,62 @@
-# MobilityTicketing: Lecture 1 starter
+# MobilityTicketing
 
-This repository is the starter code for the first lecture. It contains a small PostgreSQL slice for route maintenance and timetable queries.
+Databases for Developers (E2026) — weekly implementation labs on a fictional
+city mobility and ticketing platform (buses, trams, trains), building toward
+Compulsory Assignment #1 (due 2026-10-05).
 
-The exercise is intentionally incomplete. Add the route-stop key, complete the seed data, write the three workload queries, and follow the lab brief in `docs/lab.md`.
+The domain: customers search routes, buy digital tickets, and validate them
+when boarding; operators maintain routes/timetables and view usage/revenue
+reports. See `docs/week35-dossier.md` for the full design-brief write-up.
 
-## Start the database
+## Setup
 
-Requirements:
-
-- Docker Desktop with Compose
-
-Start PostgreSQL:
+Requirements: Docker Desktop with Compose.
 
 ```bash
 docker compose up -d
 ```
 
-The database is available at `localhost:5432` with database `mobility`, user `mobility`, and password `mobility`.
-
-To stop it:
+This starts PostgreSQL 17 (`localhost:5432`, db `mobility`, user/password
+`mobility`) and runs every script under `database/postgres/init/` in
+filename order (route/stop baseline, seed data, the week-36 ticketing
+tables and their seed). Constraint migrations are **not** run
+automatically — apply them explicitly, in order:
 
 ```bash
-docker compose down
+docker compose exec -T postgres psql -U mobility -d mobility \
+  < database/postgres/migrations/011_ticketing_integrity.sql
 ```
 
-The starter seed loads operators, routes, and stops. Complete `database/postgres/002_seed.sql` with route-stop rows and trips after deciding on the route-stop primary key. The initialization scripts run only when PostgreSQL starts with an empty data directory, so rebuild the container when you need to replay them:
+To wipe and replay everything from scratch:
 
 ```bash
 docker compose down -v
 docker compose up -d
 ```
 
-## Your tasks
+## Repository layout
 
-1. Add primary-key and foreign-key relationships where needed.
-2. Decide whether a route may visit the same stop more than once, and explain the choice.
-3. Add at least two trips per route on the same service date.
-4. Complete the three query skeletons.
-5. Compare the SQL model with your ER diagram.
-6. Record one assumption that may change later in `docs/dossier.md`.
+```
+database/postgres/
+  init/         baseline schema + seed data, run automatically on container start
+  migrations/   constraint / schema-change migrations, applied by hand and recorded here
+  experiments/  negative-test SQL: statements that must be rejected once a migration is applied
+  queries/      the released workload queries for each week
+docs/
+  weekNN-*.md   per-week write-ups: dossier notes, integrity maps, ER diagrams, evidence
+```
 
-Do not add MongoDB, Redis, queues, payment logic, validation logic, reporting tables, or performance indexes in this first slice.
+## Weekly log
 
-## Files
+| Week | Topic | Key files |
+| --- | --- | --- |
+| 35 | Relational model: route maintenance & upcoming-trip queries | `database/postgres/init/001_relational_baseline.sql`, `init/002_seed.sql`, `queries/003_queries.sql`, `docs/week35-lab.md`, `docs/week35-dossier.md` |
+| 36 | SQL constraints & operations: ticketing integrity | `database/postgres/init/010_ticketing_draft.sql` (starter, unmodified), `init/011_ticketing_seed.sql`, `migrations/011_ticketing_integrity.sql`, `experiments/constraints_should_fail.sql`, `docs/week36-integrity-map.md` |
+| 37 | SQL programmability: reporting logic | _pending_ |
+| 38 | Schema migrations: product-identity change | _pending_ |
 
-- `compose.yaml`: PostgreSQL starter infrastructure.
-- `database/postgres/001_relational_baseline.sql`: incomplete relational schema.
-- `database/postgres/002_seed.sql`: repeatable starter seed with TODOs.
-- `database/postgres/003_queries.sql.example`: query skeleton for the three released workloads.
-- `docs/lab.md`: student-facing lab brief and submission checklist.
+## Compulsory Assignment 1 review guide
 
-The sample solution is intentionally not included in this repository.
+_To be completed in week 39 — see the assignment brief for the required
+structure (submitted commit, where-to-find-the-work links, two decisions
+worth discussing, one limitation/open question)._
