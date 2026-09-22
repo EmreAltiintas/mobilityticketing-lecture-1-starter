@@ -1,5 +1,67 @@
 # Lecture 1 dossier
 
+## System context
+
+MobilityTicketing sits between transport operators and the people who ride
+with them. An operator runs routes in a city: a route has a mode (metro,
+bus, and so on), a set of stops in order, and scheduled trips on specific
+dates. A customer picks a route, buys a ticket for a specific trip, and
+validates that ticket when they board. The job of the data model is to
+keep this whole loop consistent: which trips exist and when they run,
+which tickets belong to which trip and customer, what was actually paid,
+and whether a ticket was used.
+
+There is no single "MobilityTicketing app." Several pieces read and write
+the same data: a route-planning tool used by operators, a customer-facing
+app for buying and validating tickets, a payment gateway that confirms
+captured payments, and internal reporting that shows how much money came
+in per operator per day. None of these are named as specific products on
+purpose. The point of a system context is what the data has to support,
+not which tools happen to implement it.
+
+## Access-pattern map
+
+- **Route search.** A customer or the route-planning tool looks up which
+  stops belong to a route, in order, and which trips are coming up for a
+  route after a given time. Read-only, needs to be fast, and has to
+  include routes with zero trips rather than silently dropping them.
+
+- **Ticket purchase.** A customer buys a ticket for a specific trip and
+  product (single ride, day pass, etc). This writes a ticket row tied to
+  the customer, the trip, and the product, at the price and currency that
+  applied at that moment, plus a payment row recording whether the charge
+  went through. The ticket has to keep the price the customer actually
+  paid, even if the product's catalogue price changes later.
+
+- **Ticket validation.** A customer taps their ticket when boarding. This
+  writes a validation row tied to that exact ticket, matched on both the
+  ticket id and the ticket code, so a validation can't quietly attach
+  itself to the wrong ticket if the two ever drift apart. A ticket can be
+  validated more than once on a longer trip, so this is always an insert,
+  never an update.
+
+- **Timetable updates.** An operator adds new trips, changes a trip's
+  status (delayed, cancelled), or updates route and stop details. This has
+  to happen without breaking tickets or validations that already point at
+  the older data, which is also why deletes on routes, stops and trips are
+  restricted rather than cascaded: removing a stop or a trip should not
+  quietly take a paid ticket's history down with it.
+
+- **Real-time availability.** Before or during boarding, something needs
+  to check how full a trip is: how many seats it has against how many are
+  already reserved. This has to stay correct even when two purchases
+  happen close together in time, which is one of the places this project's
+  own documentation admits a plain constraint cannot fully solve on its
+  own.
+
+- **Reporting.** An operator or finance wants to know how much captured
+  revenue came in per operator per day. This gets read far less often than
+  tickets get bought, but the read can get expensive if it is computed
+  from scratch every time. That is exactly why this project later compared
+  a direct query, a SQL function, a trigger-maintained table and a
+  materialized view against each other, and settled on the materialized
+  view as the better fit for something that can tolerate some delay.
+
 ## Route-stop primary key
 
 Key: `(route_id, stop_id)`.
@@ -13,6 +75,17 @@ gaps in meaning or ties.
 A stop may **not** occur more than once on the same route under this key. Real
 loop routes and out-and-back services do revisit a stop; supporting them means
 moving the key to `(route_id, stop_sequence)` and letting `stop_id` repeat.
+
+## ER diagram
+
+![MobilityTicketing ER diagram](week35-er-diagram.png)
+
+Chen notation. Entities: `OPERATORS`, `ROUTES`, `STOPS`, `TRIPS`, and the
+associative entity `ROUTE_STOPS` (via the `INCLUDES`/`CONTAINS`
+relationships, modelling the routes*..*stops many-to-many). Relationships:
+`OPERATES` (operator 1 -- N routes), `HAS` (route 1 -- N trips), `INCLUDES`
+(stop 1 -- N route_stops), `CONTAINS` (route 1 -- N route_stops).
+Identifiers (`id`) are underlined on every entity that has one.
 
 ## SQL model vs. ER diagram
 

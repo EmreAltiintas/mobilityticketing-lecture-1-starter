@@ -37,9 +37,9 @@ Do not add MongoDB, Redis, caching, event queues, payment logic, validation logi
 
 ## Submission checklist
 
-- [ ] Describe the customers, operators, and city transport context without naming a database product.
-- [ ] Cover route search, ticket purchase, ticket validation, timetable updates, real-time availability, and reporting in the access-pattern map.
-- [ ] Include identifiers, relationships, and cardinalities in the ER diagram.
-- [ ] Explain one functional dependency and what normalization prevents.
-- [ ] State what the implementation proves and what remains unknown.
-- [ ] Commit the implementation under `database/postgres/`.
+- [x] Describe the customers, operators, and city transport context without naming a database product. (`docs/week35-dossier.md`, "System context")
+- [x] Cover route search, ticket purchase, ticket validation, timetable updates, real-time availability, and reporting in the access-pattern map. (`docs/week35-dossier.md`, "Access-pattern map")
+- [x] Include identifiers, relationships, and cardinalities in the ER diagram. (`docs/week35-er-diagram.png`, referenced from `docs/week35-dossier.md`)
+- [x] Explain one functional dependency and what normalization prevents. (`docs/week35-dossier.md`, "One functional dependency")
+- [ ] State what the implementation proves and what remains unknown. (not yet written as its own note; partially covered by "Assumption that may change later")
+- [x] Commit the implementation under `database/postgres/`.
