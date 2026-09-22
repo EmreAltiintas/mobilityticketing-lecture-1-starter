@@ -52,7 +52,7 @@ docs/
 | --- | --- | --- |
 | 35 | Relational model: route maintenance & upcoming-trip queries | `database/postgres/init/001_relational_baseline.sql`, `init/002_seed.sql`, `queries/003_queries.sql`, `docs/week35-lab.md`, `docs/week35-dossier.md` |
 | 36 | SQL constraints & operations: ticketing integrity | `database/postgres/init/010_ticketing_draft.sql` (starter, unmodified), `init/011_ticketing_seed.sql`, `migrations/011_ticketing_integrity.sql`, `experiments/constraints_should_fail.sql`, `docs/week36-integrity-map.md` |
-| 37 | SQL programmability: reporting logic | _pending_ |
+| 37 | SQL programmability: reporting logic | `database/postgres/queries/020_base_revenue.sql`, `migrations/020_reporting_function.sql`, `migrations/021_daily_revenue_trigger.sql`, `migrations/022_daily_captured_revenue.sql`, `experiments/reporting_cases.sql`, `docs/week37-reporting.md` |
 | 38 | Schema migrations: product-identity change | _pending_ |
 
 ## Compulsory Assignment 1 review guide
