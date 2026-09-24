@@ -75,6 +75,7 @@ docs/
 
 ## Compulsory Assignment 1 review guide
 
+Group members: Emre Altintas & Justin Anthony Kapelke Jørgensen
 Submitted commit: `647c1e2993e8b932f00c5c0d8902c5cc8f0c28e7`
 Setup and reset instructions: [Setup](#setup)
 
