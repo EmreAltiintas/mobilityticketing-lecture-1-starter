@@ -75,7 +75,7 @@ docs/
 
 ## Compulsory Assignment 1 review guide
 
-Submitted commit: `<fill in after your final commit: run "git rev-parse HEAD" and paste it here>`
+Submitted commit: `647c1e2993e8b932f00c5c0d8902c5cc8f0c28e7`
 Setup and reset instructions: [Setup](#setup)
 
 ### Where to find the work
